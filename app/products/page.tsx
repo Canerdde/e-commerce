@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { getProducts, getAllCategories, Product } from "@/lib/products";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -12,7 +12,7 @@ import { Filter, X, ArrowUpDown } from "lucide-react";
 
 type SortOption = "default" | "price-asc" | "price-desc" | "name-asc" | "name-desc";
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
@@ -86,7 +86,7 @@ export default function ProductsPage() {
     }
 
     return filtered;
-  }, [selectedCategory, priceRange, selectedColors, searchQuery, sortBy]);
+  }, [selectedCategory, priceRange, selectedColors, searchQuery, sortBy, products]);
 
   const toggleColor = (color: string) => {
     setSelectedColors((prev) =>
@@ -110,7 +110,7 @@ export default function ProductsPage() {
     <div className="pt-20 min-h-screen">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
         <Breadcrumb items={[{ label: "Products" }]} />
-        
+
         {/* Header */}
         <div className="mb-16">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-6">
@@ -139,7 +139,7 @@ export default function ProductsPage() {
           </div>
           {searchQuery && (
             <div className="flex items-center gap-2 text-sm text-foreground-muted mb-4">
-              <span>Search results for: "{searchQuery}"</span>
+              <span>Search results for: &quot;{searchQuery}&quot;</span>
               <button
                 onClick={() => setSearchQuery("")}
                 className="hover:text-foreground transition-colors"
@@ -153,9 +153,8 @@ export default function ProductsPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
           <aside
-            className={`lg:w-64 flex-shrink-0 ${
-              showFilters ? "block" : "hidden lg:block"
-            }`}
+            className={`lg:w-64 flex-shrink-0 ${showFilters ? "block" : "hidden lg:block"
+              }`}
           >
             <div className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
               <div className="space-y-10 pb-4">
@@ -173,78 +172,76 @@ export default function ProductsPage() {
                   )}
                 </div>
 
-              {/* Category Filter */}
-              <div>
-                <h3 className="text-xs font-medium mb-5 text-foreground-muted tracking-wider uppercase">
-                  Category
-                </h3>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={`block w-full text-left text-sm transition-colors duration-200 py-2 ${
-                        selectedCategory === category
+                {/* Category Filter */}
+                <div>
+                  <h3 className="text-xs font-medium mb-5 text-foreground-muted tracking-wider uppercase">
+                    Category
+                  </h3>
+                  <div className="space-y-2">
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={`block w-full text-left text-sm transition-colors duration-200 py-2 ${selectedCategory === category
                           ? "text-accent font-medium"
                           : "text-foreground-muted hover:text-foreground"
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  ))}
+                          }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Price Filter */}
-              <div>
-                <h3 className="text-xs font-medium mb-5 text-foreground-muted tracking-wider uppercase">
-                  Price
-                </h3>
-                <PriceSlider
-                  min={0}
-                  max={2000}
-                  value={priceRange}
-                  onChange={setPriceRange}
-                />
-              </div>
+                {/* Price Filter */}
+                <div>
+                  <h3 className="text-xs font-medium mb-5 text-foreground-muted tracking-wider uppercase">
+                    Price
+                  </h3>
+                  <PriceSlider
+                    min={0}
+                    max={2000}
+                    value={priceRange}
+                    onChange={setPriceRange}
+                  />
+                </div>
 
-              {/* Color Filter */}
-              <div>
-                <h3 className="text-xs font-medium mb-5 text-foreground-muted tracking-wider uppercase">
-                  Color
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {allColors.map((color) => {
-                    const product = products.find((p) =>
-                      p.colors.some((c) => c.name === color)
-                    );
-                    const colorHex =
-                      product?.colors.find((c) => c.name === color)?.hex || "#000000";
-                    const isSelected = selectedColors.includes(color);
+                {/* Color Filter */}
+                <div>
+                  <h3 className="text-xs font-medium mb-5 text-foreground-muted tracking-wider uppercase">
+                    Color
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {allColors.map((color) => {
+                      const product = products.find((p) =>
+                        p.colors.some((c) => c.name === color)
+                      );
+                      const colorHex =
+                        product?.colors.find((c) => c.name === color)?.hex || "#000000";
+                      const isSelected = selectedColors.includes(color);
 
-                    return (
-                      <button
-                        key={color}
-                        onClick={() => toggleColor(color)}
-                        className={`relative w-10 h-10 rounded-sm border-2 transition-all ${
-                          isSelected
+                      return (
+                        <button
+                          key={color}
+                          onClick={() => toggleColor(color)}
+                          className={`relative w-10 h-10 rounded-sm border-2 transition-all ${isSelected
                             ? "border-accent scale-110"
                             : "border-foreground/20 hover:border-foreground/40"
-                        }`}
-                        style={{ backgroundColor: colorHex }}
-                        title={color}
-                        aria-label={`Filter by ${color}`}
-                      >
-                        {isSelected && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <X className="w-4 h-4 text-background drop-shadow-lg" />
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
+                            }`}
+                          style={{ backgroundColor: colorHex }}
+                          title={color}
+                          aria-label={`Filter by ${color}`}
+                        >
+                          {isSelected && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <X className="w-4 h-4 text-background drop-shadow-lg" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
               </div>
             </div>
           </aside>
@@ -291,3 +288,10 @@ export default function ProductsPage() {
   );
 }
 
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div>Loading products...</div>}>
+      <ProductsContent />
+    </Suspense>
+  );
+}

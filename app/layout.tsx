@@ -8,8 +8,9 @@ import { RecentlyViewedProvider } from "@/context/RecentlyViewedContext";
 import { ConditionalNavbar } from "@/components/ConditionalNavbar";
 import { CartDrawer } from "@/components/CartDrawer";
 import { Footer } from "@/components/Footer";
+import { DevToolsProtection } from "@/components/DevToolsProtection";
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
@@ -74,6 +75,7 @@ export default function RootLayout({
                 <main className="min-h-screen">{children}</main>
                 <Footer />
                 <CartDrawer />
+                <DevToolsProtection />
               </CartProvider>
             </WishlistProvider>
           </RecentlyViewedProvider>

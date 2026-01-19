@@ -42,9 +42,9 @@ export function SocialShare({ productName, productUrl }: SocialShareProps) {
         }
         break;
       case "native":
-        if (navigator.share) {
+        if ((navigator as any).share) {
           try {
-            await navigator.share({
+            await (navigator as any).share({
               title: productName,
               text: text,
               url: url,
@@ -77,7 +77,7 @@ export function SocialShare({ productName, productUrl }: SocialShareProps) {
         >
           <Facebook className="w-4 h-4" />
         </button>
-        {typeof navigator !== "undefined" && navigator.share && (
+        {typeof navigator !== "undefined" && (navigator as any).share && (
           <button
             onClick={() => handleShare("native")}
             className="p-2 hover:bg-background-secondary transition-colors duration-200"

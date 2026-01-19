@@ -64,7 +64,7 @@ export default function HomePage() {
                 Recently Viewed
               </h2>
               <p className="text-base text-foreground-muted leading-relaxed font-light max-w-xl">
-                Continue exploring items you've recently viewed
+                Continue exploring items you&apos;ve recently viewed
               </p>
             </div>
             <ProductGrid products={recentlyViewed} layout="symmetric" />

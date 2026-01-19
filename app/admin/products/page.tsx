@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useAdmin } from "@/context/AdminContext";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Product } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
-import { Plus, Edit, Trash2, Search, X, Save } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Save } from "lucide-react";
 import { useToast } from "@/context/ToastContext";
 import Image from "next/image";
 
-export default function AdminProductsPage() {
+function AdminProductsContent() {
   const { products, addProduct, updateProduct, deleteProduct } = useAdmin();
   const { showToast } = useToast();
   const searchParams = useSearchParams();
@@ -22,7 +22,7 @@ export default function AdminProductsPage() {
   useEffect(() => {
     const editId = searchParams.get("edit");
     const isNew = searchParams.get("new") === "true";
-    
+
     if (editId) {
       const product = products.find((p) => p.id === editId);
       if (product) {
@@ -352,3 +352,10 @@ export default function AdminProductsPage() {
   );
 }
 
+export default function AdminProductsPage() {
+  return (
+    <Suspense fallback={<div>Loading products...</div>}>
+      <AdminProductsContent />
+    </Suspense>
+  );
+}

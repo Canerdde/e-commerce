@@ -12,7 +12,7 @@ export default function AdminStockPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStock, setEditingStock] = useState<{
     productId: string;
-    stock: Product["stock"];
+    stock: NonNullable<Product["stock"]>;
   } | null>(null);
 
   const filteredProducts = products.filter(
@@ -174,13 +174,12 @@ export default function AdminStockPage() {
           return (
             <div
               key={product.id}
-              className={`bg-background-secondary p-6 ${
-                isOutOfStock
+              className={`bg-background-secondary p-6 ${isOutOfStock
                   ? "border-l-4 border-red-500"
                   : isLowStock
                     ? "border-l-4 border-yellow-500"
                     : "border-l-4 border-transparent"
-              }`}
+                }`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -204,13 +203,12 @@ export default function AdminStockPage() {
                         {Object.entries(sizeStock).map(([color, qty]) => (
                           <div
                             key={color}
-                            className={`flex justify-between ${
-                              qty === 0
+                            className={`flex justify-between ${qty === 0
                                 ? "text-red-500"
                                 : qty <= 5
                                   ? "text-yellow-500"
                                   : "text-foreground-muted"
-                            }`}
+                              }`}
                           >
                             <span>{color}:</span>
                             <span className="font-medium">{qty}</span>
